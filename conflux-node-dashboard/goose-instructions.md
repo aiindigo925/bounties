@@ -1,0 +1,1 @@
+You are an expert Next.js developer. Your task is to enhance a Conflux node dashboard. Review the existing code, then improve the UI/UX with a focus on 'Tactile Response' using Framer Motion. Add a node selector for different RPC endpoints, implement robust error handling, and ensure the application is responsive. Add comments and clean up the code.
