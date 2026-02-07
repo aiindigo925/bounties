@@ -11,15 +11,15 @@ async function fetchBlocks(client: any, startBlock: bigint, count: number) {
   for (let i = 0; i < count; i++) {
     const bn = latest - BigInt(i)
     try {
-      const block = await Promise.all([
+      const [block, txCount] = await Promise.all([
         client.getBlock({ blockNumber: bn }),
         client.getBlockTransactionCount({ blockNumber: bn })
       ])
       blocks.push({
         number: Number(bn),
-        txCount: Number(block[1]),
-        timestamp: Number(block[0].timestamp),
-        miner: block[0].author || block[0].miner,
+        txCount: Number(txCount),
+        timestamp: Number(block.timestamp),
+        miner: block.author || block.miner,
       })
     } catch (e) {}
   }
@@ -39,48 +39,60 @@ export default function BlocksPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-8">Recent Blocks</h1>
+      <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+        Recent Blocks
+      </h1>
       {blocksQuery.isLoading ? (
-        <div>Loading...</div>
+        <div className="flex justify-center items-center h-64">
+          <div className="text-xl text-gray-400">Loading blocks...</div>
+        </div>
       ) : blocksQuery.isError ? (
-        <div className="text-red-500">Error</div>
+        <div className="text-red-400 text-center text-xl">Error loading blocks</div>
       ) : (
         <>
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-200">
-              <thead>
+          <div className="overflow-x-auto rounded-xl shadow-xl">
+            <table className="min-w-full divide-y divide-gray-700 bg-gray-900">
+              <thead className="bg-gray-800">
                 <tr>
-                  <th className="px-6 py-3 border-b bg-gray-50 text-left">Block #</th>
-                  <th className="px-6 py-3 border-b bg-gray-50 text-left">Tx Count</th>
-                  <th className="px-6 py-3 border-b bg-gray-50 text-left">Timestamp</th>
-                  <th className="px-6 py-3 border-b bg-gray-50 text-left">Miner</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Block</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Tx Count</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Age</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Miner</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-700">
                 {blocksQuery.data?.map((block) => (
-                  <tr key={block.number}>
-                    <td className="px-6 py-4 border-b">{block.number.toLocaleString()}</td>
-                    <td className="px-6 py-4 border-b">{block.txCount}</td>
-                    <td className="px-6 py-4 border-b">{new Date(block.timestamp * 1000).toLocaleString()}</td>
-                    <td className="px-6 py-4 border-b">{(block.miner || '').slice(0,12)}...</td>
+                  <tr key={block.number} className="hover:bg-gray-800 transition">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-400">
+                      {block.number.toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                      {block.txCount}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                      {new Date(block.timestamp * 1000).toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                      {(block.miner || '').slice(0,12)}...
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <div className="flex justify-center mt-4 space-x-2">
+          <div className="flex justify-center mt-6 space-x-2">
             <button 
               onClick={() => setPage(p => Math.max(0, p-1))} 
               disabled={page === 0 || blocksQuery.isLoading}
-              className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+              className="px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 transition-colors"
             >
               Prev
             </button>
-            <span>Page {page + 1}</span>
+            <span className="px-4 py-2 text-gray-300">Page {page + 1}</span>
             <button 
               onClick={() => setPage(p => p+1)} 
               disabled={blocksQuery.isLoading}
-              className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+              className="px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 transition-colors"
             >
               Next
             </button>
