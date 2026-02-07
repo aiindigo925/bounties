@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { X402Challenge } from '../lib/x402';
 
 /**
  * x402 Agent Client
@@ -13,35 +14,35 @@ class X402Agent {
     console.log(`[Agent] Initialized with spend cap: ${spendCapWei} wei`);
   }
 
-  async callApi(url: string, invoiceId?: string): Promise<any> {
+  async callApi(url: string, invoiceId?: string): Promise&lt;lt;lt;unknown> gt;{
     const fullUrl = invoiceId ? `${url}?invoiceId=${invoiceId}` : url;
     console.log(`[Agent] Calling ${fullUrl}...`);
 
     try {
       const response = await axios.get(fullUrl, {
-        validateStatus: (status) => status < 500, // Don't throw on 402
+        validateStatus: (status) => status &lt;lt;lt; 500, // Don't throw on 402
       });
 
       if (response.status === 402) {
-        return this.handle402(url, response.data.challenge);
+        return this.handle402(url, response.data.challenge as X402Challenge);
       }
 
       console.log(`[Agent] Success! Data received.`);
       return response.data;
-    } catch (error: any) {
-      console.error(`[Agent] Request failed: ${error.message}`);
+    } catch (error: unknown) {
+      console.error(`[Agent] Request failed: ${(error as Error).message}`);
       throw error;
     }
   }
 
-  private async handle402(url: string, challenge: any): Promise<any> {
+  private async handle402(url: string, challenge: X402Challenge): Promise&lt;lt;lt;unknown> gt;{
     const { amount, invoiceId, description } = challenge;
     const amountNum = parseInt(amount);
 
     console.log(`[Agent] Encountered paywall: ${description}`);
     console.log(`[Agent] Cost: ${amount} wei`);
 
-    if (this.totalSpent + amountNum > this.spendCap) {
+    if (this.totalSpent + amountNum > gt;this.spendCap) {
       console.error(`[Agent] Budget exceeded! Cannot pay for this request.`);
       throw new Error('Budget exceeded');
     }
@@ -67,23 +68,5 @@ class X402Agent {
     return this.callApi(url, invoiceId);
   }
 }
-
-// Demo Execution
-async function runDemo() {
-  const agent = new X402Agent(1000000000000000000); // 1 CFX cap
-  const apiUrl = 'http://localhost:3000/api/premium';
-
-  console.log('--- Starting x402 Agent Demo ---');
-  try {
-    const result = await agent.callApi(apiUrl);
-    console.log('--- Final Result ---');
-    console.log(JSON.stringify(result, null, 2));
-  } catch (err) {
-    console.log('--- Demo Failed ---');
-  }
-}
-
-// In a real scenario, this would be a long-running process
-// runDemo();
 
 export { X402Agent };

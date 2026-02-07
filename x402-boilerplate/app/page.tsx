@@ -32,7 +32,7 @@ export default function Home() {
         setError(null);
         addLog(`Success! Received premium data.`);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       addLog(`Error: ${err.message}`);
     } finally {
       setLoading(false);

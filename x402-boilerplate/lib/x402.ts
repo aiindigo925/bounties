@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export interface X402Challenge {
   amount: string; // in wei
@@ -8,6 +8,7 @@ export interface X402Challenge {
   endpoint: string;
   invoiceId: string;
   description: string;
+  recipient: string;
 }
 
 export function createX402Response(challenge: X402Challenge) {
@@ -28,6 +29,7 @@ export function createX402Response(challenge: X402Challenge) {
         'X-Payment-Endpoint': challenge.endpoint,
         'X-Payment-Invoice-Id': challenge.invoiceId,
         'X-Payment-Description': challenge.description,
+        'X-Payment-Recipient': challenge.recipient,
       },
     }
   );
@@ -47,6 +49,7 @@ export function createInvoice(endpoint: string, amount: string, description: str
     endpoint,
     invoiceId,
     description,
+    recipient: '0x742d35Cc6634C0532925a3b8D7cf6F5B70Aa932e', // Example seller wallet
   };
   invoices.set(invoiceId, { ...challenge, status: 'pending' });
   return challenge;
