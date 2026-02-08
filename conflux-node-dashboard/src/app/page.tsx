@@ -16,10 +16,10 @@ const Overview = () => {
   const { data: peers, error: peersError, isLoading: peersLoading } = useSWR([rpcUrl, 'peers'], () => getPeersCount(rpcUrl));
   const { data: clientVersion, error: clientError } = useSWR([rpcUrl, 'client'], () => getClientVersion(rpcUrl));
 
-  const [blockTimeHistory, setBlockTimeHistory] = useState<{ time: string; blockTime: number }>([]); 
-  const [gasHistory, setGasHistory] = useState<{ time: string; gas: number }>([]);
-  const [pendingHistory, setPendingHistory] = useState<{ time: string; pending: number }>([]);
-  const [lagHistory, setLagHistory] = useState<{ time: string; lag: number }>([]);
+  const [blockTimeHistory, setBlockTimeHistory] = useState<{ time: string; blockTime: number }[]>([]);
+  const [gasHistory, setGasHistory] = useState<{ time: string; gas: number }[]>([]);
+  const [pendingHistory, setPendingHistory] = useState<{ time: string; pending: number }[]>([]);
+  const [lagHistory, setLagHistory] = useState<{ time: string; lag: number }[]>([]);
 
   const prevBlockRef = useRef('');
   const prevTimeRef = useRef(0);
@@ -29,7 +29,7 @@ const Overview = () => {
       const now = Date.now();
       const blockNum = parseInt(status.blockNumber, 16);
       const prevBlockNum = parseInt(prevBlockRef.current, 16);
-      if (prevBlockRef.current &amp;&amp; prevTimeRef.current &amp;&amp; blockNum > prevBlockNum) {
+      if (prevBlockRef.current && prevTimeRef.current && blockNum > prevBlockNum) {
         const deltaBlocks = blockNum - prevBlockNum;
         const deltaTime = (now - prevTimeRef.current) / 1000 / deltaBlocks;
         const timeStr = new Date().toISOString();
@@ -59,7 +59,7 @@ const Overview = () => {
 
   const avgBlockTime = blockTimeHistory.length > 0 ? blockTimeHistory.reduce((sum, b) => sum + b.blockTime, 0) / blockTimeHistory.length : 0;
 
-  const health = !statusError &amp;&amp; !gasError &amp;&amp; !peersError;
+  const health = !statusError && !gasError && !peersError;
 
   if (statusLoading || gasLoading) {
     return <div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div></div>;
@@ -148,9 +148,9 @@ const Overview = () => {
           </ResponsiveContainer>
         </div>
       </div>
-      {statusError &amp;&amp; <div className="mt-8 p-4 bg-red-900 border border-red-500 rounded-xl"><h3 className="font-bold">Status Error:</h3><p>{statusError.message}</p></div>}
-      {gasError &amp;&amp; <div className="mt-8 p-4 bg-red-900 border border-red-500 rounded-xl"><h3 className="font-bold">Gas Error:</h3><p>{gasError.message}</p></div>}
-      {peersError &amp;&amp; <div className="mt-8 p-4 bg-red-900 border border-red-500 rounded-xl"><h3 className="font-bold">Peers Error:</h3><p>{peersError.message}</p></div>}
+      {statusError && <div className="mt-8 p-4 bg-red-900 border border-red-500 rounded-xl"><h3 className="font-bold">Status Error:</h3><p>{statusError.message}</p></div>}
+      {gasError && <div className="mt-8 p-4 bg-red-900 border border-red-500 rounded-xl"><h3 className="font-bold">Gas Error:</h3><p>{gasError.message}</p></div>}
+      {peersError && <div className="mt-8 p-4 bg-red-900 border border-red-500 rounded-xl"><h3 className="font-bold">Peers Error:</h3><p>{peersError.message}</p></div>}
     </div>
   );
 };

@@ -4,7 +4,7 @@ import './globals.css';
 import Nav from '../components/Nav';
 import { RpcProvider } from '../contexts/RpcContext';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   title: 'Conflux Node Dashboard',

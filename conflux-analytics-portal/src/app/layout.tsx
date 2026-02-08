@@ -4,7 +4,7 @@ import './globals.css';
 import Link from 'next/link';
 import { Providers } from './providers';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   title: 'Conflux Analytics Portal',

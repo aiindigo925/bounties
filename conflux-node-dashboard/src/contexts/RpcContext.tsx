@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useContext, useState, useEffect, React.ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface RpcContextType {
   rpcUrl: string;
