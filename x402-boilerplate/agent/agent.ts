@@ -14,13 +14,13 @@ class X402Agent {
     console.log(`[Agent] Initialized with spend cap: ${spendCapWei} wei`);
   }
 
-  async callApi(url: string, invoiceId?: string): Promise&lt;lt;lt;unknown> gt;{
+  async callApi(url: string, invoiceId?: string): Promise<unknown> {
     const fullUrl = invoiceId ? `${url}?invoiceId=${invoiceId}` : url;
     console.log(`[Agent] Calling ${fullUrl}...`);
 
     try {
       const response = await axios.get(fullUrl, {
-        validateStatus: (status) => status &lt;lt;lt; 500, // Don't throw on 402
+        validateStatus: (status) => status < 500, // Don't throw on 402
       });
 
       if (response.status === 402) {
@@ -35,14 +35,14 @@ class X402Agent {
     }
   }
 
-  private async handle402(url: string, challenge: X402Challenge): Promise&lt;lt;lt;unknown> gt;{
+  private async handle402(url: string, challenge: X402Challenge): Promise<unknown> {
     const { amount, invoiceId, description } = challenge;
     const amountNum = parseInt(amount);
 
     console.log(`[Agent] Encountered paywall: ${description}`);
     console.log(`[Agent] Cost: ${amount} wei`);
 
-    if (this.totalSpent + amountNum > gt;this.spendCap) {
+    if (this.totalSpent + amountNum > this.spendCap) {
       console.error(`[Agent] Budget exceeded! Cannot pay for this request.`);
       throw new Error('Budget exceeded');
     }

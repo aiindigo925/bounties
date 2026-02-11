@@ -33,7 +33,8 @@ export default function Home() {
         addLog(`Success! Received premium data.`);
       }
     } catch (err: unknown) {
-      addLog(`Error: ${err.message}`);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      addLog(`Error: ${message}`);
     } finally {
       setLoading(false);
     }
