@@ -52,6 +52,7 @@ export default function Dashboard() {
   });
 
   const [blockTimeHistory, setBlockTimeHistory] = useState<{ time: string; blockTime: number }[]>([]);
+  const [tpsHistory, setTpsHistory] = useState<{ time: string; tps: number }[]>([]);
   const prevTimestampRef = useRef(0);
   const prevBlockRef = useRef(0);
 
@@ -60,12 +61,18 @@ export default function Dashboard() {
       const now = Date.now();
       const currentBlock = latestBlockQuery.data.number;
       const currentTime = latestBlockQuery.data.timestamp * 1000;
+      const currentTxCount = latestBlockQuery.data.txCount;
+      
       if (prevTimestampRef.current && prevBlockRef.current !== 0) {
         const deltaBlocks = currentBlock - prevBlockRef.current;
         if (deltaBlocks > 0) {
           const deltaTime = (now - prevTimestampRef.current) / 1000 / deltaBlocks;
           const timeStr = new Date().toISOString();
           setBlockTimeHistory(prev => [{ time: timeStr, blockTime: deltaTime }, ...prev.slice(0, 50)]);
+          
+          // Calculate TPS: transactions per second
+          const tps = currentTxCount / deltaTime || 0;
+          setTpsHistory(prev => [{ time: timeStr, tps }, ...prev.slice(0, 50)]);
         }
       }
       prevTimestampRef.current = currentTime;
@@ -128,7 +135,7 @@ export default function Dashboard() {
         <div className="bg-gray-800 p-6 rounded-xl shadow-xl">
           <h2 className="text-2xl font-bold mb-4 text-gray-200">Recent TPS</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={[{tps: 100}]}> {/* placeholder, enhance later */}
+            <LineChart data={tpsHistory.slice().reverse()}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis dataKey="time" />
               <YAxis />
