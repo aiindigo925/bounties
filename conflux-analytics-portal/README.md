@@ -1,15 +1,17 @@
 # Conflux Analytics Portal
 
-Production-ready Next.js 16 app (compatible with 15) for Conflux Core mainnet analytics.
+Production-ready Next.js analytics dashboard for Conflux Core mainnet with real-time monitoring.
 
 ## Features
-- Dashboard: Latest block, estimated TPS, block charts (Recharts), responsive Tailwind UI
-- Blocks page: Paginated table of recent blocks
-- Txs page: Paginated table of recent transactions
-- Real-time updates via TanStack Query (refetch 5-30s)
-- Real data from https://main.confluxrpc.com (viem)
-- Error/loading handling
-- Build & lint pass (lint minor issue)
+- **Dashboard**: Live metrics (Chain ID, latest block, pending TX, gas price, finality lag)
+- **Real-time TPS**: Calculated from actual transaction throughput and block times
+- **Block Time Charts**: Historical block timing with live updates
+- **Blocks Explorer**: Paginated table of recent blocks with transaction counts
+- **Transaction Explorer**: Paginated transaction history with CFX values
+- **Responsive UI**: Dark theme Tailwind CSS with gradient accents
+- **Live Updates**: 5-30s refresh intervals via TanStack Query
+- **Error Handling**: Comprehensive error states and loading indicators
+- **Health Monitoring**: Network health status based on RPC connectivity
 
 ## Setup
 ```bash
