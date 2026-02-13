@@ -6,6 +6,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { getStatus, getGasPrice, getPeersCount, getClientVersion } from '@/lib/rpc';
 import { useRpc } from '@/contexts/RpcContext';
 import { useState, useEffect, useRef } from 'react';
+import { AdvancedMonitoring } from '@/components/AdvancedMonitoring';
 
 const formatHex = (hex: string) => parseInt(hex, 16).toLocaleString();
 
@@ -148,6 +149,12 @@ const Overview = () => {
           </ResponsiveContainer>
         </div>
       </div>
+      
+      {/* Advanced Monitoring Section */}
+      <div className="mt-8">
+        <AdvancedMonitoring />
+      </div>
+
       {statusError && <div className="mt-8 p-4 bg-red-900 border border-red-500 rounded-xl"><h3 className="font-bold">Status Error:</h3><p>{statusError.message}</p></div>}
       {gasError && <div className="mt-8 p-4 bg-red-900 border border-red-500 rounded-xl"><h3 className="font-bold">Gas Error:</h3><p>{gasError.message}</p></div>}
       {peersError && <div className="mt-8 p-4 bg-red-900 border border-red-500 rounded-xl"><h3 className="font-bold">Peers Error:</h3><p>{peersError.message}</p></div>}

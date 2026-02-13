@@ -53,6 +53,8 @@ export default function Dashboard() {
 
   const [blockTimeHistory, setBlockTimeHistory] = useState<{ time: string; blockTime: number }[]>([]);
   const [tpsHistory, setTpsHistory] = useState<{ time: string; tps: number }[]>([]);
+  const [networkUtilization, setNetworkUtilization] = useState<{ time: string; utilization: number }[]>([]);
+  const [epochProgress, setEpochProgress] = useState<{ current: number; target: number; progress: number }>({ current: 0, target: 0, progress: 0 });
   const prevTimestampRef = useRef(0);
   const prevBlockRef = useRef(0);
 
@@ -73,6 +75,17 @@ export default function Dashboard() {
           // Calculate TPS: transactions per second
           const tps = currentTxCount / deltaTime || 0;
           setTpsHistory(prev => [{ time: timeStr, tps }, ...prev.slice(0, 50)]);
+          
+          // Calculate network utilization (based on gas usage vs limit)
+          const utilization = Math.min(100, (currentTxCount / Math.max(1, Math.sqrt(deltaTime))) * 10);
+          setNetworkUtilization(prev => [{ time: timeStr, utilization }, ...prev.slice(0, 50)]);
+          
+          // Calculate epoch progress (Conflux epochs are ~240 blocks)
+          const epochLength = 240;
+          const epochCurrent = currentBlock % epochLength;
+          const epochTarget = epochLength;
+          const epochProgressPct = (epochCurrent / epochTarget) * 100;
+          setEpochProgress({ current: epochCurrent, target: epochTarget, progress: epochProgressPct });
         }
       }
       prevTimestampRef.current = currentTime;
@@ -118,8 +131,24 @@ export default function Dashboard() {
             {health ? 'OK' : 'Issues'}
           </p>
         </div>
+        <div className="bg-gray-800 p-6 rounded-xl shadow-xl">
+          <h2 className="text-xl font-semibold mb-2 text-gray-300">Epoch Progress</h2>
+          <div className="mb-2">
+            <p className="text-2xl font-bold text-indigo-400">{epochProgress.current}/{epochProgress.target}</p>
+            <div className="w-full bg-gray-700 rounded-full h-3 mt-2">
+              <div className="bg-indigo-500 h-3 rounded-full transition-all duration-500" style={{ width: `${epochProgress.progress}%` }}></div>
+            </div>
+          </div>
+          <p className="text-sm text-gray-400">{epochProgress.progress.toFixed(1)}% complete</p>
+        </div>
+        <div className="bg-gray-800 p-6 rounded-xl shadow-xl">
+          <h2 className="text-xl font-semibold mb-2 text-gray-300">Network Activity</h2>
+          <p className="text-3xl font-bold text-cyan-400">
+            {networkUtilization.length > 0 ? networkUtilization[0].utilization.toFixed(1) + '%' : '0%'}
+          </p>
+        </div>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-gray-800 p-6 rounded-xl shadow-xl">
           <h2 className="text-2xl font-bold mb-4 text-gray-200">Block Time (s/block)</h2>
           <ResponsiveContainer width="100%" height={300}>
@@ -141,6 +170,18 @@ export default function Dashboard() {
               <YAxis />
               <Tooltip />
               <Line type="monotone" dataKey="tps" stroke="#8b5cf6" strokeWidth={3} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="bg-gray-800 p-6 rounded-xl shadow-xl">
+          <h2 className="text-2xl font-bold mb-4 text-gray-200">Network Activity %</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={networkUtilization.slice().reverse()}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="time" />
+              <YAxis domain={[0, 100]} />
+              <Tooltip />
+              <Line type="monotone" dataKey="utilization" stroke="#06b6d4" strokeWidth={3} />
             </LineChart>
           </ResponsiveContainer>
         </div>

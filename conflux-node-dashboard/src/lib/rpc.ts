@@ -16,3 +16,21 @@ export const getGasPrice = (rpcUrl: string) => callRpc(rpcUrl, 'cfx_gasPrice', [
 export const getPeersCount = (rpcUrl: string) => callRpc(rpcUrl, 'net_peerCount', []);
 export const getClientVersion = (rpcUrl: string) => callRpc(rpcUrl, 'cfx_getClientVersion', []);
 export const getBlockNumber = (rpcUrl: string) => callRpc(rpcUrl, 'cfx_blockNumber', []);
+
+// Advanced monitoring functions
+export const getNodeHealth = async (rpcUrl: string) => {
+  const start = Date.now();
+  const status = await getStatus(rpcUrl);
+  const responseTime = Date.now() - start;
+  return { ...status, responseTime };
+};
+
+export const getNetworkInfo = (rpcUrl: string) => callRpc(rpcUrl, 'net_networkID', []);
+export const getSyncProgress = async (rpcUrl: string) => {
+  try {
+    const syncing = await callRpc(rpcUrl, 'cfx_syncing', []);
+    return syncing;
+  } catch (error) {
+    return false; // Not syncing
+  }
+};
