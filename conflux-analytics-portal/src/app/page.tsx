@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useConfluxClient } from '@/hooks/useConfluxClient';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useState, useEffect, useRef } from 'react';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 const formatNumber = (n: number | bigint | string): string => {
   if (typeof n === 'bigint') return n.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -97,7 +98,11 @@ export default function Dashboard() {
   const lag = status && status.blockNumber && status.latestFinalized ? 
     parseInt(status.blockNumber, 16) - parseInt(status.latestFinalized, 16) : 0;
 
-  if (latestBlockQuery.isLoading) return <div className="flex justify-center items-center h-64"><div>Loading...</div></div>;
+  if (latestBlockQuery.isLoading) return (
+    <div className="flex justify-center items-center h-64">
+      <LoadingSpinner size="lg" message="Loading Conflux analytics..." />
+    </div>
+  );
 
   return (
     <div>
