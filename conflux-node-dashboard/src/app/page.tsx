@@ -7,12 +7,25 @@ import { getStatus, getGasPrice, getPeersCount, getClientVersion } from '@/lib/r
 import { useRpc } from '@/contexts/RpcContext';
 import { useState, useEffect, useRef } from 'react';
 import { AdvancedMonitoring } from '@/components/AdvancedMonitoring';
+import PerformanceMetrics from '@/components/PerformanceMetrics';
+import ConnectionTester from '@/components/ConnectionTester';
 
 const formatHex = (hex: string) => parseInt(hex, 16).toLocaleString();
 
 const Overview = () => {
   const { rpcUrl } = useRpc();
-  const { data: status, error: statusError, isLoading: statusLoading } = useSWR([rpcUrl, 'status'], ([ , ] ) => getStatus(rpcUrl));
+  const [currentResponseTime, setCurrentResponseTime] = useState(0);
+  
+  // Track response time for status calls
+  const statusFetcher = async () => {
+    const start = Date.now();
+    const result = await getStatus(rpcUrl);
+    const responseTime = Date.now() - start;
+    setCurrentResponseTime(responseTime);
+    return result;
+  };
+  
+  const { data: status, error: statusError, isLoading: statusLoading } = useSWR([rpcUrl, 'status'], statusFetcher, { refreshInterval: 5000 });
   const { data: gasPrice, error: gasError, isLoading: gasLoading } = useSWR([rpcUrl, 'gas'], () => getGasPrice(rpcUrl));
   const { data: peers, error: peersError, isLoading: peersLoading } = useSWR([rpcUrl, 'peers'], () => getPeersCount(rpcUrl));
   const { data: clientVersion, error: clientError } = useSWR([rpcUrl, 'client'], () => getClientVersion(rpcUrl));
@@ -153,6 +166,16 @@ const Overview = () => {
       {/* Advanced Monitoring Section */}
       <div className="mt-8">
         <AdvancedMonitoring />
+      </div>
+
+      {/* Performance Metrics Section */}
+      <div className="mt-8">
+        <PerformanceMetrics responseTime={currentResponseTime} />
+      </div>
+
+      {/* Connection Tester Section */}
+      <div className="mt-8">
+        <ConnectionTester rpcUrl={rpcUrl} />
       </div>
 
       {statusError && <div className="mt-8 p-4 bg-red-900 border border-red-500 rounded-xl"><h3 className="font-bold">Status Error:</h3><p>{statusError.message}</p></div>}
