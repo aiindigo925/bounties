@@ -1,9 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, beforeEach, afterEach, vi } from '@jest/globals';
 import HomePage from '../app/page';
 
 // Mock fetch for API calls
-const mockFetch = vi.fn();
+const mockFetch = jest.fn();
 global.fetch = mockFetch;
 
 // Mock environment variables
@@ -18,7 +17,7 @@ beforeEach(() => {
 
 afterEach(() => {
   process.env = originalEnv;
-  vi.clearAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('X402 Boilerplate Integration Tests', () => {
@@ -141,12 +140,12 @@ describe('X402 Boilerplate Integration Tests', () => {
   it('persists payment state across page reloads', async () => {
     // Mock localStorage
     const localStorageMock = {
-      getItem: vi.fn(() => JSON.stringify({ 
+      getItem: jest.fn(() => JSON.stringify({ 
         paymentVerified: true, 
         expires: Date.now() + 3600000 
       })),
-      setItem: vi.fn(),
-      removeItem: vi.fn()
+      setItem: jest.fn(),
+      removeItem: jest.fn()
     };
     Object.defineProperty(window, 'localStorage', {
       value: localStorageMock
@@ -162,12 +161,12 @@ describe('X402 Boilerplate Integration Tests', () => {
 
   it('expires cached payment after timeout', () => {
     const localStorageMock = {
-      getItem: vi.fn(() => JSON.stringify({ 
+      getItem: jest.fn(() => JSON.stringify({ 
         paymentVerified: true, 
         expires: Date.now() - 1000 // Expired 1 second ago
       })),
-      setItem: vi.fn(),
-      removeItem: vi.fn()
+      setItem: jest.fn(),
+      removeItem: jest.fn()
     };
     Object.defineProperty(window, 'localStorage', {
       value: localStorageMock
